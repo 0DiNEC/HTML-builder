@@ -2,6 +2,8 @@ const fs = require('fs');
 const path = require('path');
 
 const outputFolderPath = path.join(__dirname, 'project-dist');
+const sourceHTML = path.join(__dirname, 'template.html');
+const targetHTML = path.join(outputFolderPath, 'template.html');
 
 // make output dir
 async function makeDir() {
@@ -9,17 +11,32 @@ async function makeDir() {
   await fs.promises.mkdir(outputFolderPath);
 }
 
-async function copyPageElements() {
-    // copy css
-  const sourceFolderPath = path.join(__dirname, 'styles');
-  const outputFilePath = path.join(__dirname, 'project-dist', 'style.css');
+// copy Files
+async function copyFile() {
+  await fs.promises.copyFile(sourceHTML, targetHTML);
 
+  // copy css
+  const cssFilePath = path.join(outputFolderPath, 'style.css');
+  await fs.promises.writeFile(cssFilePath, '');
+  const pathCSS = path.join(__dirname, 'styles\\');
+  const filesCSS = (await fs.promises.readdir(pathCSS)).filter(
+    (file) => path.extname(file) === '.css'
+  );
 
+  for (const file of filesCSS) {
+    const filePath = path.join(pathCSS, file);
+    const sourceDataFileCSS = await fs.promises.readFile(filePath, 'utf-8');
+
+    await fs.promises.appendFile(
+      cssFilePath,
+      sourceDataFileCSS,
+      () => {}
+    );
+  }
 }
 
 async function createHTML(componentsPath) {
   const files = await fs.promises.readdir(componentsPath);
-  const targetHTML = path.join(outputFolderPath, 'template.html');
 
   for (const file of files) {
     if (path.extname(file).toLowerCase() === '.html') {
@@ -37,8 +54,11 @@ async function createHTML(componentsPath) {
 }
 
 function buildPage() {
-  // makeDir();
-  // createHTML(path.join(__dirname, 'components'));
+  makeDir().then(() => {
+    copyFile().then(() => {
+      createHTML(path.join(__dirname, 'components'));
+    });
+  });
 }
 
 buildPage();
