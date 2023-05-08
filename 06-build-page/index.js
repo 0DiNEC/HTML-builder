@@ -27,12 +27,33 @@ async function copyFile() {
     const filePath = path.join(pathCSS, file);
     const sourceDataFileCSS = await fs.promises.readFile(filePath, 'utf-8');
 
-    await fs.promises.appendFile(
-      cssFilePath,
-      sourceDataFileCSS,
-      () => {}
-    );
+    await fs.promises.appendFile(cssFilePath, sourceDataFileCSS, () => {});
   }
+
+  // copy Assets
+  const assetsSourcePath = path.join(__dirname, 'assets');
+  const assetsTargetPath = path.join(outputFolderPath, 'assets');
+
+  await fs.promises.rm(assetsTargetPath, { recursive: true, force: true });
+
+  // create copy folder
+  const copyFolder = async (sourcePath, destinationPath) => {
+    await fs.promises.mkdir(destinationPath);
+    const assetsFiles = await fs.promises.readdir(sourcePath);
+    for (const file of assetsFiles) {
+      const sourcePathFile = path.join(sourcePath, file);
+      const destinationPathFile = path.join(destinationPath, file);
+      const fileStats = await fs.promises.stat(sourcePathFile);
+
+      if (fileStats.isDirectory()) {
+        await copyFolder(sourcePathFile, destinationPathFile);
+      } else {
+        await fs.promises.copyFile(sourcePathFile, destinationPathFile);
+      }
+    }
+  };
+
+  copyFolder(assetsSourcePath, assetsTargetPath);
 }
 
 async function createHTML(componentsPath) {
