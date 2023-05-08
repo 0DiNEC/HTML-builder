@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const sourceFolderPath = path.join(__dirname, '\\styles');
-const outputFilePath = path.join(__dirname, '\\project-dist\\bundle.css');
+const sourceFolderPath = path.join(__dirname, 'styles');
+const outputFilePath = path.join(__dirname, 'project-dist', 'bundle.css');
 
 fs.writeFile(outputFilePath, '', () => {});
 
