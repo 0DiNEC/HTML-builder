@@ -18,7 +18,7 @@ async function copyFile() {
   // copy css
   const cssFilePath = path.join(outputFolderPath, 'style.css');
   await fs.promises.writeFile(cssFilePath, '');
-  const pathCSS = path.join(__dirname, 'styles\\');
+  const pathCSS = path.join(__dirname, 'styles');
   const filesCSS = (await fs.promises.readdir(pathCSS)).filter(
     (file) => path.extname(file) === '.css'
   );
